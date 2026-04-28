@@ -1,0 +1,223 @@
+{% extends 'layout.html' %} <!-- Inherits from base layout template -->
+{% block title %}Calendar - University Application Tracker{% endblock %} <!-- Sets page title -->
+{% block content %} <!-- Defines content block that replaces parent template -->
+  <div class="calendar-container"> <!-- Main container for calendar page -->
+    <h1>Application Calendar</h1> <!-- Page heading -->
+    
+    <div class="calendar-controls"> <!-- Navigation controls for month/year -->
+      <button onclick="previousMonth()">&lt; Previous</button> <!-- Go to previous month -->
+      <h2 id="monthYear"></h2> <!-- Displays current month and year -->
+      <button onclick="nextMonth()">Next &gt;</button> <!-- Go to next month -->
+    </div>
+
+    <div class="calendar-grid" id="calendarGrid"></div> <!-- Calendar grid container -->
+
+    <div class="event-section"> <!-- Section for adding new events -->
+      <h2>Add Custom Event</h2> <!-- Section heading -->
+      <form id="eventForm" class="event-form"> <!-- Form for creating custom events -->
+        <label> <!-- Form field label -->
+          Event Title: <!-- Label text -->
+          <input type="text" name="title" required> <!-- Text input for event title -->
+        </label>
+        <label> <!-- Form field label -->
+          Event Type: <!-- Label text -->
+          <select name="event_type" required> <!-- Dropdown for event type -->
+            <option value="interview">Interview</option> <!-- Option for interview -->
+            <option value="submission">Submission</option> <!-- Option for submission -->
+            <option value="reminder">Reminder</option> <!-- Option for reminder -->
+            <option value="other">Other</option> <!-- Option for other types -->
+          </select>
+        </label>
+        <label>
+          Date:
+          <input type="date" name="date" required>
+        </label>
+        <label>
+          Description:
+          <textarea name="description" rows="3"></textarea>
+        </label>
+        <button type="submit">Add Event</button>
+      </form>
+    </div>
+
+    <div class="events-list">
+      <h2>Events This Month</h2>
+      <div id="eventsList"></div>
+    </div>
+  </div>
+
+  <script> <!-- JavaScript code for calendar functionality -->
+    let currentDate = new Date(); // Current date being displayed on calendar
+    let allApplications = []; // Array to store user's applications
+    let allCustomEvents = []; // Array to store user's custom events
+
+    // Function to load data from server when page loads
+    async function loadData() {
+      try {
+        // Fetch applications from API
+        const appsResponse = await fetch('/api/applications');
+        allApplications = await appsResponse.json();
+        
+        // Fetch custom events from API
+        const eventsResponse = await fetch('/api/custom_events');
+        allCustomEvents = await eventsResponse.json();
+        
+        renderCalendar(); // Display the calendar
+      } catch (error) {
+        console.error('Error loading data:', error); // Log errors to console
+      }
+    }
+
+    // Function to render the calendar grid
+    function renderCalendar() {
+      const year = currentDate.getFullYear(); // Get current year
+      const month = currentDate.getMonth(); // Get current month (0-11)
+      
+      // Update month/year display
+      document.getElementById('monthYear').textContent = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      
+      // Calculate calendar layout
+      const firstDay = new Date(year, month, 1); // First day of month
+      const lastDay = new Date(year, month + 1, 0); // Last day of month
+      const daysInMonth = lastDay.getDate(); // Number of days in month
+      const startingDayOfWeek = firstDay.getDay(); // Day of week (0=Sunday, 6=Saturday)
+      
+      // Start building HTML for calendar
+      let html = '<div class="weekdays"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div><div class="days">';
+      
+      // Add empty cells for days before the first day of month
+      for (let i = 0; i < startingDayOfWeek; i++) {
+        html += '<div class="empty-day"></div>';
+      }
+      
+      // Create a cell for each day of the month
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, month, day); // Create date object for this day
+        const dateStr = date.toISOString().split('T')[0]; // Convert to YYYY-MM-DD format
+        
+        // Find applications and events for this date
+        const deadlines = allApplications.filter(app => app.deadline === dateStr);
+        const events = allCustomEvents.filter(event => event.date === dateStr);
+        
+        // Set CSS classes based on what's on this day
+        let cellClass = 'day';
+        if (deadlines.length > 0) cellClass += ' has-deadline'; // Yellow background for deadlines
+        if (events.length > 0) cellClass += ' has-event'; // Blue background for events
+        
+        // Start building the day cell HTML
+        html += `<div class="${cellClass}">
+          <div class="day-number">${day}</div> <!-- Day number (1-31) -->
+          <div class="day-content">`;
+        
+        // Add up to 2 deadline titles
+        deadlines.forEach((app, idx) => {
+          if (idx < 2) { // Limit to 2 items to avoid overcrowding
+            const shortName = app.university.length > 15 ? app.university.substring(0, 12) + '...' : app.university; // Truncate long names
+            html += `<div class="deadline-title">📋 ${shortName}</div>`; // Add deadline with icon
+          }
+        });
+        
+        // Add up to 2 custom event titles
+        events.forEach((event, idx) => {
+          if (idx < 2) { // Limit to 2 items to avoid overcrowding
+            const shortTitle = event.title.length > 15 ? event.title.substring(0, 12) + '...' : event.title; // Truncate long titles
+            const icon = event.event_type === 'interview' ? '🗣️' : '📌'; // Different icons for different event types
+            html += `<div class="event-title">${icon} ${shortTitle}</div>`; // Add event with appropriate icon
+          }
+        });
+        
+        // If there are more than 2 items total, show a "more" indicator
+        if (deadlines.length + events.length > 2) {
+          html += `<div class="more-items">+${deadlines.length + events.length - 2} more</div>`;
+        }
+        
+        html += '</div></div>'; // Close day-content and day divs
+      }
+      
+      html += '</div>'; // Close days div
+      document.getElementById('calendarGrid').innerHTML = html; // Insert HTML into page
+      
+      renderEventsList(); // Also update the events list below calendar
+    }
+
+    // Function to render the detailed events list below the calendar
+    function renderEventsList() {
+      const year = currentDate.getFullYear(); // Current year
+      const month = currentDate.getMonth(); // Current month
+      
+      let html = ''; // HTML string to build
+      
+      // Loop through each day of the current month
+      for (let day = 1; day <= new Date(year, month + 1, 0).getDate(); day++) {
+        const date = new Date(year, month, day); // Date object for this day
+        const dateStr = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+        
+        // Find items for this date
+        const deadlines = allApplications.filter(app => app.deadline === dateStr);
+        const events = allCustomEvents.filter(event => event.date === dateStr);
+        
+        // Only show days that have items
+        if (deadlines.length > 0 || events.length > 0) {
+          html += `<div class="event-day"><strong>${date.toLocaleDateString()}</strong>`; // Day header
+          
+          // List all deadlines for this day
+          deadlines.forEach(app => {
+            html += `<p class="deadline-item">📋 ${app.university} - ${app.program}</p>`; // University and program
+          });
+          
+          // List all custom events for this day
+          events.forEach(event => {
+            html += `<p class="custom-item">${event.event_type === 'interview' ? '🗣️' : '📌'} ${event.title}</p>`; // Event with icon
+          });
+          
+          html += '</div>'; // Close event-day div
+        }
+      }
+      
+      document.getElementById('eventsList').innerHTML = html || '<p>No events this month</p>';
+    }
+
+    // Function to go to previous month
+    function previousMonth() {
+      currentDate.setMonth(currentDate.getMonth() - 1); // Subtract 1 month
+      renderCalendar(); // Re-render calendar
+    }
+
+    // Function to go to next month
+    function nextMonth() {
+      currentDate.setMonth(currentDate.getMonth() + 1); // Add 1 month
+      renderCalendar(); // Re-render calendar
+    }
+
+    // Event listener for the custom event form submission
+    document.getElementById('eventForm').addEventListener('submit', async (e) => {
+      e.preventDefault(); // Prevent page reload
+      
+      // Collect form data
+      const formData = {
+        title: document.querySelector('input[name="title"]').value,
+        event_type: document.querySelector('select[name="event_type"]').value,
+        date: document.querySelector('input[name="date"]').value,
+        description: document.querySelector('textarea[name="description"]').value,
+      };
+      
+      try {
+        // Send data to server
+        const response = await fetch('/api/custom_events', {
+          method: 'POST', // HTTP POST method
+          headers: { 'Content-Type': 'application/json' }, // Send JSON data
+          body: JSON.stringify(formData), // Convert object to JSON string
+        });
+        
+        if (response.ok) { // If successful
+          document.getElementById('eventForm').reset(); // Clear form
+          loadData(); // Reload data and refresh calendar
+        }
+      } catch (error) {
+        console.error('Error adding event:', error); // Log errors
+      }
+    });
+
+    loadData(); // Load data when page first loads
+  </script>
+{% endblock %}

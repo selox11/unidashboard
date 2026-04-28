@@ -1,0 +1,21 @@
+<!DOCTYPE html> <!-- Tells browser this is HTML5 document -->
+<html lang="en"> <!-- Root element, language set to English -->
+  <head> <!-- Contains metadata about the document -->
+    <meta charset="UTF-8" /> <!-- Character encoding for the page -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /> <!-- Makes page responsive on mobile devices -->
+    <title>{% block title %}{% endblock %}</title> <!-- Page title, filled by child templates -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" /> <!-- Links to CSS file -->
+  </head>
+  <body> <!-- Main content of the page -->
+    <header> <!-- Site header with navigation -->
+      <nav> <!-- Navigation menu -->
+        <a href="{{ url_for('dashboard') }}">Main Page</a> <!-- Link to dashboard -->
+        <a href="{{ url_for('profile') }}">Profile</a> <!-- Link to profile page -->
+        <a href="{{ url_for('calendar') }}">Calendar</a> <!-- Link to calendar page -->
+      </nav>
+    </header>
+    <main class="page"> <!-- Main content area -->
+      {% block content %}{% endblock %} <!-- Content placeholder filled by child templates -->
+    </main>
+  </body>
+</html>

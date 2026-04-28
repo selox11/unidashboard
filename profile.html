@@ -1,0 +1,31 @@
+{% extends 'layout.html' %}
+{% block title %}Profile - University Application Tracker{% endblock %}
+{% block content %}
+  <div class="profile-container">
+    <h1>Profile</h1>
+    <p>Manage your account settings.</p>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    <div class="profile-info">
+      <h2>Account Information</h2>
+      <p><strong>Username:</strong> {{ user.username }}</p>
+    </div>
+    <div class="change-password">
+      <h2>Change Password</h2>
+      <form method="POST" action="{{ url_for('change_password') }}">
+        <label for="current_password">Current Password:</label>
+        <input type="password" id="current_password" name="current_password" required>
+        <label for="new_password">New Password:</label>
+        <input type="password" id="new_password" name="new_password" required>
+        <label for="confirm_password">Confirm New Password:</label>
+        <input type="password" id="confirm_password" name="confirm_password" required>
+        <button type="submit">Change Password</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}

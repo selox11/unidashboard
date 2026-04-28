@@ -1,0 +1,217 @@
+<!-- dashboard.html - Main dashboard page for the University Application Tracker -->
+<!-- This page shows the user's applications, statistics, and forms to add new applications -->
+<!-- It uses Jinja2 templating to insert dynamic data from the Flask backend -->
+
+{% extends 'layout.html' %} <!-- Inherit the base layout (header, navigation) from layout.html -->
+{% block title %}Dashboard - University Application Tracker{% endblock %} <!-- Set the page title in the browser tab -->
+
+{% block content %} <!-- Start of the main content block that replaces the content in layout.html -->
+
+  <!-- Deadline reminders section - shows urgent upcoming deadlines -->
+  <!-- Initially hidden, shown by JavaScript if there are deadlines within 7 days -->
+  <div id="reminders-section" class="reminders-section" style="display: none;">
+    <div class="reminder-alert">
+      <h3>⏰ Upcoming Deadlines</h3>
+      <ul id="remindersList"></ul> <!-- JavaScript will populate this list -->
+    </div>
+  </div>
+
+  <!-- Main dashboard header with title and user info -->
+  <header class="dashboard-header">
+    <div>
+      <p class="eyebrow">Dashboard</p> <!-- Small label above the main title -->
+      <h1>University Application Tracker</h1> <!-- Main page heading -->
+      <p class="subtitle">
+        Track deadlines, manage application statuses, and add universities in one place.
+      </p> <!-- Description of what the page does -->
+    </div>
+    <div class="header-actions">
+      <!-- Show current user's name using Jinja2 variable from Flask -->
+      <span class="user-badge">Signed in as {{ user.username }}</span>
+      <!-- Logout link using Flask's url_for to generate the correct URL -->
+      <a class="ghost-btn" href="{{ url_for('logout') }}">Logout</a>
+    </div>
+  </header>
+
+  <!-- Statistics section - shows counts of applications by status -->
+  <!-- These numbers are updated by JavaScript when the page loads -->
+  <section class="stats" aria-label="Application statistics">
+    <article class="stat-card">
+      <span>Total</span>
+      <strong id="totalCount">0</strong> <!-- Total applications count -->
+    </article>
+    <article class="stat-card">
+      <span>Pending</span>
+      <strong id="pendingCount">0</strong> <!-- Pending applications count -->
+    </article>
+    <article class="stat-card">
+      <span>Applied</span>
+      <strong id="appliedCount">0</strong> <!-- Applied applications count -->
+    </article>
+    <article class="stat-card">
+      <span>Accepted</span>
+      <strong id="acceptedCount">0</strong> <!-- Accepted applications count -->
+    </article>
+    <article class="stat-card">
+      <span>Rejected</span>
+      <strong id="rejectedCount">0</strong> <!-- Rejected applications count -->
+    </article>
+  </section>
+
+  <!-- Controls section - filters and search -->
+  <section class="panel controls-panel">
+    <div class="toolbar">
+      <!-- Filter buttons - allow user to show only certain application statuses -->
+      <div class="filters" aria-label="Filter applications by status">
+        <button class="filter-btn active" data-filter="All" type="button">All</button>
+        <button class="filter-btn" data-filter="Pending" type="button">Pending</button>
+        <button class="filter-btn" data-filter="Applied" type="button">Applied</button>
+        <button class="filter-btn" data-filter="Accepted" type="button">Accepted</button>
+        <button class="filter-btn" data-filter="Rejected" type="button">Rejected</button>
+      </div>
+
+      <!-- Search input - filters applications by university, program, or country -->
+      <label class="search-wrap">
+        <input id="searchInput" type="search" placeholder="Search university, program, country..." />
+      </label>
+    </div>
+  </section>
+
+  <!-- Main content grid - two columns: form on left, progress sidebar on right -->
+  <section class="grid-layout">
+    <!-- Left column: Form to add new applications -->
+    <section class="panel form-panel">
+      <h2>Add new application</h2>
+      <!-- Form that sends data to JavaScript instead of directly to server -->
+      <!-- JavaScript handles the submission and API calls -->
+      <form id="applicationForm" class="application-form">
+        <label>
+          University
+          <input type="text" id="university" required /> <!-- Required field for university name -->
+        </label>
+
+        <label>
+          Program
+          <input type="text" id="program" required /> <!-- Required field for program/major -->
+        </label>
+
+        <label>
+          Country
+          <input type="text" id="country" required /> <!-- Required field for country -->
+        </label>
+
+        <label>
+          Deadline
+          <input type="date" id="deadline" required /> <!-- Date picker for application deadline -->
+        </label>
+
+        <label>
+          Status
+          <select id="status"> <!-- Dropdown to set initial application status -->
+            <option value="Pending">Pending</option>
+            <option value="Applied">Applied</option>
+            <option value="Accepted">Accepted</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+        </label>
+
+        <label class="full-width"> <!-- Takes full width of the form -->
+          Notes
+          <textarea id="notes" rows="3" placeholder="Optional notes"></textarea> <!-- Optional notes field -->
+        </label>
+
+        <!-- Submit button - JavaScript prevents default form submission and handles it via API -->
+        <button class="primary-btn full-width" type="submit">Add application</button>
+      </form>
+    </section>
+
+    <!-- Right column: Progress overview and upcoming deadlines -->
+    <aside class="panel side-panel">
+      <h2>Progress overview</h2>
+
+      <!-- Progress bar showing completion percentage -->
+      <div class="progress-box">
+        <div class="progress-label-row">
+          <span>Completion</span>
+          <strong id="completionText">0%</strong> <!-- Updated by JavaScript -->
+        </div>
+        <div class="progress-bar">
+          <div id="progressFill" class="progress-fill"></div> <!-- Visual progress bar -->
+        </div>
+      </div>
+
+      <!-- List of upcoming deadlines (next 4 soonest) -->
+      <h3>Upcoming deadlines</h3>
+      <div id="deadlineList" class="deadline-list"></div> <!-- Populated by JavaScript -->
+    </aside>
+  </section>
+
+  <!-- Applications list section - shows all user's applications -->
+  <section class="panel">
+    <div class="list-header">
+      <h2>Your applications</h2>
+      <!-- Status message showing how many applications are displayed -->
+      <p id="statusMessage">Loading data...</p> <!-- Updated by JavaScript -->
+    </div>
+
+    <!-- Grid where individual application cards are inserted by JavaScript -->
+    <section id="applicationsGrid" class="applications-grid" aria-label="Applications list"></section>
+  </section>
+
+  <!-- Load the main JavaScript file that handles all dashboard interactivity -->
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+  <!-- Inline JavaScript for deadline checking - runs when page loads -->
+  <script>
+    // Function to check for upcoming deadlines and show reminder alerts
+    async function checkDeadlines() {
+      try {
+        // Fetch all applications from the API
+        const response = await fetch('/api/applications');
+        const applications = await response.json(); // Parse JSON response
+
+        const today = new Date(); // Get today's date
+        const deadlines = []; // Array to store urgent deadlines
+
+        // Loop through all applications to find urgent deadlines
+        applications.forEach(app => {
+          const deadline = new Date(app.deadline); // Convert deadline string to Date object
+          // Calculate days until deadline
+          const daysUntil = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+
+          // If deadline is within 7 days (including today), add to urgent list
+          if (daysUntil >= 0 && daysUntil <= 7) {
+            deadlines.push({
+              university: app.university,
+              days: daysUntil,
+              deadline: app.deadline
+            });
+          }
+        });
+
+        // If there are urgent deadlines, show the reminder section
+        if (deadlines.length > 0) {
+          const remindersSection = document.getElementById('reminders-section'); // Get the hidden section
+          const remindersList = document.getElementById('remindersList'); // Get the list element
+          remindersList.innerHTML = ''; // Clear any existing content
+
+          // Sort deadlines by soonest first, then create list items
+          deadlines.sort((a, b) => a.days - b.days).forEach(item => {
+            const li = document.createElement('li'); // Create new list item
+            // Format the days text (special case for today)
+            const daysText = item.days === 0 ? 'TODAY' : `${item.days} day${item.days > 1 ? 's' : ''} left`;
+            li.textContent = `${item.university} - ${daysText}`; // Set the text
+            remindersList.appendChild(li); // Add to the list
+          });
+
+          remindersSection.style.display = 'block'; // Make the section visible
+        }
+      } catch (error) {
+        console.error('Error checking deadlines:', error); // Log any errors
+      }
+    }
+
+    // Run the deadline check when the page loads
+    checkDeadlines();
+  </script>
+{% endblock %} <!-- End of the content block -->

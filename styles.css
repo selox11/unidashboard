@@ -1,0 +1,827 @@
+/* CSS Reset and Global Styles */
+/* This section sets up the basic styling that applies to the entire website */
+
+* {
+  box-sizing: border-box; /* Include padding and borders in element width/height calculations */
+}
+
+/* styles.css - Cascading Style Sheets for University Application Tracker */
+/* CSS is a language that describes how HTML elements should be displayed on screen */
+/* This file controls the visual appearance of your website - colors, fonts, layout, spacing */
+
+:root { /* CSS Custom Properties (Variables) - These are reusable color and size values */
+  --bg: #f3f6fb; /* Background color for the page */
+  --panel: #ffffff; /* Background color for white panels/cards */
+  --text: #1f2937; /* Main text color */
+  --muted: #6b7280; /* Muted text color for less important text */
+  --border: #d9e1ef; /* Border color for form inputs and cards */
+  --primary: #3867ff; /* Primary brand color (blue) */
+  --primary-dark: #2450de; /* Darker version of primary color for hover states */
+  --pending: #d97706; /* Color for pending status */
+  --applied: #2563eb; /* Color for applied status */
+  --accepted: #059669; /* Color for accepted status */
+  --rejected: #dc2626; /* Color for rejected status */
+  --shadow: 0 14px 36px rgba(15, 23, 42, 0.08); /* Box shadow for depth/elevation */
+  --radius: 22px; /* Border radius for rounded corners */
+}
+
+body { /* Body element styles - applies to the entire page */
+  margin: 0; /* Remove default margin */
+  font-family: Arial, sans-serif; /* Font family for all text */
+  background: linear-gradient(180deg, #eef3ff 0%, var(--bg) 45%, #f9fbff 100%); /* Gradient background from light blue to white */
+  color: var(--text); /* Text color */
+}
+
+.calendar-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.calendar-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0;
+  gap: 20px;
+}
+
+.calendar-controls button {
+  padding: 10px 20px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.calendar-controls button:hover {
+  background: var(--primary-dark);
+}
+
+.calendar-grid {
+  background: var(--panel);
+  padding: 20px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 30px;
+}
+
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+  margin-bottom: 10px;
+  font-weight: bold;
+  text-align: center;
+  color: var(--primary);
+}
+
+.days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+}
+
+.day {
+  aspect-ratio: 1;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  min-height: 80px;
+  overflow: hidden;
+}
+
+.day-number {
+  font-weight: bold;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.day-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 2px;
+  overflow: hidden;
+  font-size: 0.65rem;
+}
+
+.deadline-title {
+  background: #fbbf24;
+  padding: 2px 4px;
+  border-radius: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #78350f;
+  font-weight: 500;
+}
+
+.event-title {
+  background: #60a5fa;
+  padding: 2px 4px;
+  border-radius: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: white;
+  font-weight: 500;
+}
+
+.more-items {
+  font-size: 0.6rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.event-section { /* Custom event form section - where users add new events */
+  background: var(--panel); /* White background */
+  padding: 20px; /* Padding */
+  border-radius: var(--radius); /* Rounded corners */
+  box-shadow: var(--shadow); /* Shadow */
+  margin-bottom: 30px; /* Bottom margin */
+}
+
+.event-form { /* Event creation form styling */
+  display: flex; /* Flexbox layout */
+  flex-direction: column; /* Vertical layout */
+  gap: 15px; /* Gap between form elements */
+}
+
+.event-form label { /* Form labels */
+  display: flex; /* Flexbox */
+  flex-direction: column; /* Vertical layout */
+  gap: 5px; /* Gap between label and input */
+  font-weight: 500; /* Medium font weight */
+}
+
+.event-form input, /* Form inputs */
+.event-form select, /* Dropdown selects */
+.event-form textarea { /* Text areas */
+  padding: 10px; /* Padding */
+  border: 1px solid var(--border); /* Border */
+  border-radius: 5px; /* Rounded corners */
+  font-family: Arial, sans-serif; /* Font family */
+}
+
+.event-form button { /* Form submit button */
+  padding: 10px 20px; /* Padding */
+  background: var(--primary); /* Background color */
+  color: white; /* Text color */
+  border: none; /* No border */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor */
+  align-self: flex-start; /* Align to start of flex container */
+}
+
+.event-form button:hover { /* Button hover state */
+  background: var(--primary-dark); /* Darker background */
+}
+
+.events-list { /* Events list section - shows all events by date */
+  background: var(--panel); /* White background */
+  padding: 20px; /* Padding */
+  border-radius: var(--radius); /* Rounded corners */
+  box-shadow: var(--shadow); /* Shadow */
+}
+
+.event-day { /* Individual day in events list */
+  margin-bottom: 15px; /* Bottom margin */
+  padding: 10px; /* Padding */
+  border-left: 4px solid var(--primary); /* Left border accent */
+  background: var(--bg); /* Light background */
+  border-radius: 5px; /* Rounded corners */
+}
+
+.event-day strong { /* Day date header */
+  color: var(--primary); /* Primary color */
+}
+
+.deadline-item { /* Application deadline items */
+  margin: 5px 0; /* Vertical margin */
+  color: #d97706; /* Orange color */
+  font-size: 0.95rem; /* Font size */
+}
+
+.custom-item { /* Custom event items */
+  margin: 5px 0; /* Vertical margin */
+  color: #2563eb; /* Blue color */
+  font-size: 0.95rem; /* Font size */
+}
+
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 20px 48px;
+}
+
+.hero,
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  line-height: 1.05;
+}
+
+.subtitle {
+  max-width: 720px;
+  color: var(--muted);
+  margin: 10px 0 0;
+  line-height: 1.5;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px;
+}
+
+.stat-card span {
+  color: var(--muted);
+  display: block;
+  margin-bottom: 8px;
+}
+
+.stat-card strong {
+  font-size: 1.9rem;
+}
+
+.controls-panel {
+  padding: 16px 20px;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+}
+
+.filters {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-btn,
+.primary-btn,
+.ghost-btn,
+select,
+input,
+textarea {
+  font: inherit;
+}
+
+.filter-btn,
+.ghost-btn {
+  border: 1px solid var(--border);
+  background: #eef2ff;
+  color: var(--text);
+  padding: 12px 16px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.filter-btn:hover,
+.ghost-btn:hover,
+.primary-btn:hover {
+  transform: translateY(-1px);
+}
+
+.filter-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.ghost-btn {
+  background: white;
+}
+
+.search-wrap {
+  width: min(360px, 100%);
+}
+
+.search-wrap input {
+  width: 100%;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  background: white;
+  outline: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(56, 103, 255, 0.12);
+}
+
+.grid-layout {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 20px;
+}
+
+.form-panel h2,
+.side-panel h2,
+.panel h2,
+.side-panel h3 {
+  margin-top: 0;
+}
+
+.application-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.application-form label,
+.auth-form label {
+  display: grid;
+  gap: 8px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.primary-btn {
+  border: none;
+  background: var(--primary);
+  color: white;
+  padding: 13px 18px;
+  border-radius: 14px;
+  cursor: pointer;
+}
+
+.primary-btn:hover {
+  background: var(--primary-dark);
+}
+
+.progress-box {
+  margin-bottom: 22px;
+}
+
+.progress-label-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.progress-bar {
+  height: 14px;
+  background: #e7ecf7;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--primary), #7b9cff);
+  border-radius: 999px;
+  transition: width 0.25s ease;
+}
+
+.deadline-list {
+  display: grid;
+  gap: 12px;
+}
+
+.deadline-item {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 14px;
+  background: #fafcff;
+}
+
+.deadline-item h4 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+}
+
+.deadline-item p {
+  margin: 4px 0;
+  color: var(--muted);
+}
+
+.days-chip {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.days-chip.urgent {
+  background: #fee2e2;
+  color: var(--rejected);
+}
+
+.days-chip.upcoming {
+  background: #fef3c7;
+  color: var(--pending);
+}
+
+.days-chip.safe {
+  background: #dcfce7;
+  color: var(--accepted);
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.list-header p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.applications-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.application-card {
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 18px;
+  background: white;
+  display: grid;
+  gap: 14px;
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.card-top h3 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.program {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.badge {
+  padding: 8px 11px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.badge.pending {
+  background: #fef3c7;
+  color: var(--pending);
+}
+
+.badge.applied {
+  background: #dbeafe;
+  color: var(--applied);
+}
+
+.badge.accepted {
+  background: #d1fae5;
+  color: var(--accepted);
+}
+
+.badge.rejected {
+  background: #fee2e2;
+  color: var(--rejected);
+}
+
+.meta {
+  display: grid;
+  gap: 10px;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  background: #f8faff;
+  border-radius: 14px;
+}
+
+.meta-row span:first-child {
+  color: var(--muted);
+}
+
+.note-box {
+  background: #f8faff;
+  border-radius: 14px;
+  padding: 12px;
+  color: #374151;
+  line-height: 1.5;
+}
+
+.note-box strong {
+  display: inline-block;
+  margin-right: 4px;
+}
+
+.card-actions {
+  display: grid;
+  gap: 8px;
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  border: 1px dashed var(--border);
+  border-radius: 20px;
+  padding: 30px 20px;
+  color: var(--muted);
+}
+
+.auth-card {
+  max-width: 420px;
+  margin: 64px auto;
+  padding: 32px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 26px;
+  box-shadow: var(--shadow);
+}
+
+.auth-card h1 {
+  font-size: 2rem;
+}
+
+.auth-card p {
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+
+.auth-form {
+  display: grid;
+  gap: 16px;
+}
+
+.auth-footer {
+  margin-top: 18px;
+  color: var(--muted);
+}
+
+.auth-footer a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.flash-messages {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.flash {
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: #f8d7da;
+  color: #842029;
+}
+
+.flash.error {
+  background: #fee2e6;
+  color: #9f1239;
+}
+
+.user-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 1000px) {
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .grid-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .applications-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-wrap {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero,
+  .dashboard-header {
+    flex-direction: column;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .application-form {
+    grid-template-columns: 1fr;
+  }
+
+  .applications-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .list-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+header { /* Site header styling - the navigation bar at the top */
+  background: var(--panel); /* White background */
+  padding: 10px 20px; /* Padding */
+  box-shadow: var(--shadow); /* Shadow for depth */
+  margin-bottom: 20px; /* Bottom margin */
+}
+
+header nav { /* Navigation links container */
+  display: flex; /* Flexbox layout */
+  gap: 20px; /* Gap between links */
+}
+
+header nav a { /* Individual navigation links */
+  color: var(--primary); /* Primary color */
+  text-decoration: none; /* Remove underline */
+  font-weight: 500; /* Medium font weight */
+}
+
+header nav a:hover { /* Link hover state */
+  text-decoration: underline; /* Add underline on hover */
+}
+
+.profile-container { /* Profile page container */
+  max-width: 600px; /* Maximum width */
+  margin: 0 auto; /* Center horizontally */
+}
+
+.profile-info, /* Profile information section */
+.change-password { /* Change password section */
+  background: var(--panel); /* White background */
+  padding: 20px; /* Padding */
+  border-radius: var(--radius); /* Rounded corners */
+  box-shadow: var(--shadow); /* Shadow */
+  margin-bottom: 20px; /* Bottom margin */
+}
+
+.change-password form { /* Password change form */
+  display: flex; /* Flexbox layout */
+  flex-direction: column; /* Vertical layout */
+  gap: 10px; /* Gap between elements */
+}
+
+.change-password label { /* Form labels */
+  font-weight: 500; /* Medium font weight */
+}
+
+.change-password input { /* Form inputs */
+  padding: 10px; /* Padding */
+  border: 1px solid var(--border); /* Border */
+  border-radius: 5px; /* Rounded corners */
+}
+
+.change-password button { /* Submit button */
+  padding: 10px; /* Padding */
+  background: var(--primary); /* Background color */
+  color: white; /* Text color */
+  border: none; /* No border */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor */
+}
+
+.change-password button:hover { /* Button hover state */
+  background: var(--primary-dark); /* Darker background */
+}
+
+.flash-messages { /* Flash messages container - success/error messages */
+  margin-bottom: 20px; /* Bottom margin */
+}
+
+.flash { /* Individual flash message */
+  padding: 10px; /* Padding */
+  border-radius: 5px; /* Rounded corners */
+  margin-bottom: 10px; /* Bottom margin */
+}
+
+.flash.success { /* Success message styling */
+  background: var(--accepted); /* Green background */
+  color: white; /* White text */
+}
+
+.flash.error { /* Error message styling */
+  background: var(--rejected); /* Red background */
+  color: white; /* White text */
+}
+
+.reminders-section { /* Deadline reminders section on dashboard */
+  margin-bottom: 20px; /* Bottom margin */
+}
+
+.reminder-alert { /* Reminder alert box */
+  background: var(--primary); /* Primary color background */
+  color: white; /* White text */
+  padding: 15px; /* Padding */
+  border-radius: var(--radius); /* Rounded corners */
+  box-shadow: var(--shadow); /* Shadow */
+}
+
+.reminder-alert h3 { /* Alert heading */
+  margin-top: 0; /* Remove top margin */
+}
+
+.reminder-alert ul { /* Unordered list in alert */
+  list-style: none; /* Remove bullet points */
+  padding: 0; /* Remove padding */
+  margin: 10px 0 0 0; /* Top margin */
+}
+
+.reminder-alert li { /* List items in alert */
+  padding: 8px; /* Padding */
+  background: rgba(255, 255, 255, 0.1); /* Semi-transparent white background */
+  border-radius: 5px; /* Rounded corners */
+  margin-bottom: 8px; /* Bottom margin */
+}
